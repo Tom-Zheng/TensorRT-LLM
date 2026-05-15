@@ -246,6 +246,11 @@ public:
         FmhaAutoTuner autoTuner(options, optionsFromArgs, params.mMultiProcessorCount);
         std::tie(options, optionsFromArgs, ctaDim) = autoTuner.selectKernel();
 
+        // Hotfix: set numInstsKv = 2 for skip softmax gen phase.
+        if (options.mSkipsSoftmaxWhenPossible && isSwapsMmaAbForGenerationKernel(options.mFmhaKernelType)) {
+            options.mNumInstsKv = 2;
+        }
+
         // Check if the options are valid or not.
         checkFmhaOptions(options, optionsFromArgs);
         // Update the options if needed.
